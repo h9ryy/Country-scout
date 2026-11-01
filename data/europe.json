@@ -1,0 +1,282 @@
+{
+  "continents": {
+    "europe": "Европа"
+  },
+  "levels": {
+    "1": "Лёгкий",
+    "2": "Средний",
+    "3": "Сложный"
+  },
+  "countries": [
+    {
+      "code": "gb",
+      "name": "Великобритания",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "fr",
+      "name": "Франция",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "de",
+      "name": "Германия",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "it",
+      "name": "Италия",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "es",
+      "name": "Испания",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "ru",
+      "name": "Россия",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "ua",
+      "name": "Украина",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "pl",
+      "name": "Польша",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "se",
+      "name": "Швеция",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "no",
+      "name": "Норвегия",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "fi",
+      "name": "Финляндия",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "nl",
+      "name": "Нидерланды",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "pt",
+      "name": "Португалия",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "gr",
+      "name": "Греция",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "ch",
+      "name": "Швейцария",
+      "continent": "europe",
+      "level": 1
+    },
+    {
+      "code": "at",
+      "name": "Австрия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "be",
+      "name": "Бельгия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "dk",
+      "name": "Дания",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "ie",
+      "name": "Ирландия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "cz",
+      "name": "Чехия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "hu",
+      "name": "Венгрия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "ro",
+      "name": "Румыния",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "bg",
+      "name": "Болгария",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "rs",
+      "name": "Сербия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "hr",
+      "name": "Хорватия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "by",
+      "name": "Беларусь",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "is",
+      "name": "Исландия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "sk",
+      "name": "Словакия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "si",
+      "name": "Словения",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "lt",
+      "name": "Литва",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "lv",
+      "name": "Латвия",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "ee",
+      "name": "Эстония",
+      "continent": "europe",
+      "level": 2
+    },
+    {
+      "code": "al",
+      "name": "Албания",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "ba",
+      "name": "Босния и Герцеговина",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "me",
+      "name": "Черногория",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "mk",
+      "name": "Северная Македония",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "md",
+      "name": "Молдова",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "lu",
+      "name": "Люксембург",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "mt",
+      "name": "Мальта",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "ad",
+      "name": "Андорра",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "li",
+      "name": "Лихтенштейн",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "mc",
+      "name": "Монако",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "sm",
+      "name": "Сан-Марино",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "va",
+      "name": "Ватикан",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "xk",
+      "name": "Косово",
+      "continent": "europe",
+      "level": 3
+    }
+  ]
+}
