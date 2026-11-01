@@ -5,7 +5,7 @@ from pathlib import Path
 
 from config import EUROPE_JSON, FLAGS_DIR
 
-SERIES_LENGTH = 10                     # вопросов в одной серии
+SERIES_BY_LEVEL = {1: 10, 2: 15, 3: 20}   # вопросов в одной серии
 OPTIONS_BY_LEVEL = {1: 3, 2: 4, 3: 4}  # сколько вариантов ответа на уровне
 
 with open(EUROPE_JSON, encoding="utf-8") as f:
@@ -33,9 +33,10 @@ def get_pool(continent: str, level: int) -> list[dict]:
 
 
 def new_series(continent: str, level: int) -> list[str]:
-    """Коды стран для одной серии: без повторов, не больше SERIES_LENGTH."""
+    """Коды стран для одной серии: без повторов, длина зависит от уровня."""
     pool = get_pool(continent, level)
-    chosen = random.sample(pool, min(SERIES_LENGTH, len(pool)))
+    length = SERIES_BY_LEVEL[level]
+    chosen = random.sample(pool, min(length, len(pool)))
     return [c["code"] for c in chosen]
 
 

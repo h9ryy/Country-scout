@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, FSInputFile, Message
@@ -7,6 +9,14 @@ from bot.keyboards import after_series_kb, continents_kb, options_kb
 from bot.storage import add_answer, get_balance
 
 router = Router()
+
+# Кэш: код страны -> file_id картинки в Telegram (флаг грузится один раз)
+_file_ids: dict[str, str] = {}
+
+
+async def _await(method) -> None:
+    """Обёртка: asyncio.gather не принимает методы aiogram напрямую."""
+    await method
 
 
 async def send_question(message: Message, state: FSMContext) -> None:
@@ -18,11 +28,14 @@ async def send_question(message: Message, state: FSMContext) -> None:
     question = make_question(code, data["continent"], data["level"])
     await state.update_data(current=code)
 
-    await message.answer_photo(
-        FSInputFile(question.flag_path),
+    photo = _file_ids.get(code) or FSInputFile(question.flag_path)
+    sent = await message.answer_photo(
+        photo,
         caption=f"Вопрос {index + 1} из {total}\nКакая это страна?",
         reply_markup=options_kb(question.options),
     )
+    if code not in _file_ids:
+        _file_ids[code] = sent.photo[-1].file_id
 
 
 async def start_series(message: Message, state: FSMContext) -> None:
@@ -44,6 +57,7 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
             "Этот вопрос уже закрыт. Начни заново: /start", show_alert=True
         )
         return
+    await callback.answer()  # сразу гасим индикатор загрузки на кнопке
     await state.update_data(current=None)
 
     chosen = callback.data.split(":", 1)[1]
@@ -66,19 +80,19 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
         change = f"{gained} 🌐" if gained else "Баланс не меняется: ниже 0 не опускаемся"
         result = f"❌ Неверно: это {name}, а не {chosen_name}.\n{change}"
 
-    # Убираем кнопки и показываем результат прямо под флагом
-    await callback.message.edit_caption(
+    edit = callback.message.edit_caption(
         caption=f"Вопрос {index + 1} из {total}\n{result}\nБаланс: {balance} 🌐",
         reply_markup=None,
     )
-    await callback.answer()
 
     index += 1
     await state.update_data(index=index, correct=correct)
 
     if index < total:
-        await send_question(callback.message, state)
+        # Обновление подписи и отправка следующего флага идут одновременно
+        await asyncio.gather(_await(edit), send_question(callback.message, state))
     else:
+        await edit
         await callback.message.answer(
             f"🏁 Серия окончена!\n"
             f"Верных ответов: {correct} из {total}\n"

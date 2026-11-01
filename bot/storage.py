@@ -54,3 +54,14 @@ async def add_answer(user_id: int, username: str | None, is_correct: bool) -> in
         )
         row = await cur.fetchone()
     return row[0]
+
+
+async def get_stats(user_id: int) -> tuple[int, int, int]:
+    """Возвращает (глобусы, верных, ошибок) игрока."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            "SELECT globes, correct, wrong FROM players WHERE user_id = ?",
+            (user_id,),
+        )
+        row = await cur.fetchone()
+    return tuple(row) if row else (0, 0, 0)
