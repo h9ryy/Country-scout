@@ -3,18 +3,28 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from bot.handlers.quiz import start_series
 from bot.game import CONTINENTS, LEVELS
+from bot.handlers.quiz import start_series
 from bot.keyboards import continents_kb, levels_kb
 from bot.storage import get_progress
+from config import SCORES_BY_LEVEL
 
 router = Router()
 
 WELCOME = (
-    "🌍 Привет! Угадывай страны по флагам.\n"
-    "Верный ответ: +3 🌐, ошибка: −1 🌐.\n\n"
+    "🌍 Привет! Угадывай страны по флагам и зарабатывай глобусы 🌐.\n"
+    "Очки зависят от уровня: чем сложнее, тем дороже ошибка.\n\n"
     "Выбери материк:"
 )
+
+
+def _rules_text() -> str:
+    """Блок «верно / ошибка» по уровням, берётся из config.py."""
+    lines = []
+    for level, name in LEVELS.items():
+        reward, penalty = SCORES_BY_LEVEL[int(level)]
+        lines.append(f"{name}: +{reward} / −{abs(penalty)} 🌐")
+    return "\n".join(lines)
 
 
 @router.message(CommandStart())
@@ -45,7 +55,8 @@ async def choose_continent(callback: CallbackQuery, state: FSMContext) -> None:
     }
 
     await callback.message.edit_text(
-        f"{CONTINENTS[continent]}. Выбери уровень:",
+        f"{CONTINENTS[continent]}. Выбери уровень:\n\n"
+        f"За верный ответ / за ошибку:\n{_rules_text()}",
         reply_markup=levels_kb(continent, progress),
     )
     await callback.answer()

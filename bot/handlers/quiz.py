@@ -85,7 +85,9 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
 
     user = callback.from_user
     old_balance = await get_balance(user.id)
-    balance = await add_answer(user.id, user.username, ok, scored=scored)
+    balance = await add_answer(
+        user.id, user.username, ok, data["level"], scored=scored
+    )
     gained = balance - old_balance
 
     name = BY_CODE[current]["name"]

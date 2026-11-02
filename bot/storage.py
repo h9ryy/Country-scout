@@ -1,6 +1,6 @@
 import aiosqlite
 
-from config import DB_PATH, PERFECT_RUNS_TO_MASTER, SCORE_CORRECT, SCORE_WRONG
+from config import DB_PATH, PERFECT_RUNS_TO_MASTER, SCORES_BY_LEVEL
 
 
 async def init_db() -> None:
@@ -45,16 +45,19 @@ async def add_answer(
     user_id: int,
     username: str | None,
     is_correct: bool,
+    level: int,
     scored: bool = True,
 ) -> int:
     """Записывает ответ и возвращает новый баланс (не ниже 0).
 
+    Очки зависят от уровня (см. SCORES_BY_LEVEL в config.py).
     scored=False: глобусы не меняются ни в плюс, ни в минус
     (освоенный уровень), но счётчики верных/неверных растут.
     """
     delta = 0
     if scored:
-        delta = SCORE_CORRECT if is_correct else SCORE_WRONG
+        reward, penalty = SCORES_BY_LEVEL[level]
+        delta = reward if is_correct else penalty
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             "INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)",
