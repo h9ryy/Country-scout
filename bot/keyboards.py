@@ -35,10 +35,11 @@ def levels_kb(continent: str) -> InlineKeyboardMarkup:
 
 
 def options_kb(options: list[dict]) -> InlineKeyboardMarkup:
-    """Кнопки с названиями стран для вопроса."""
+    """Кнопки с названиями стран + кнопка остановки теста."""
     kb = InlineKeyboardBuilder()
     for country in options:
         kb.button(text=country["name"], callback_data=f"ans:{country['code']}")
+    kb.button(text="⏹ Остановить тест", callback_data="stop")
     kb.adjust(1)
     return kb.as_markup()
 

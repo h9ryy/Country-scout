@@ -109,3 +109,35 @@ async def play_again(callback: CallbackQuery, state: FSMContext) -> None:
     else:
         await start_series(callback.message, state)
     await callback.answer()
+    
+@router.callback_query(F.data == "stop")
+async def stop_test(callback: CallbackQuery, state: FSMContext) -> None:
+    data = await state.get_data()
+
+    # Вопрос уже закрыт, тест остановлен раньше или бота перезапускали
+    if data.get("current") is None:
+        await callback.answer(
+            "Тест уже закончен. Начни заново: /start", show_alert=True
+        )
+        return
+    await callback.answer()
+    await state.update_data(current=None)
+
+    answered = data["index"]
+    total = len(data["series"])
+    correct = data["correct"]
+
+    # Убираем кнопки у текущего вопроса и помечаем его
+    await callback.message.edit_caption(
+        caption=f"{callback.message.caption or ''}\n⏹ Остановлено",
+        reply_markup=None,
+    )
+
+    balance = await get_balance(callback.from_user.id)
+    await callback.message.answer(
+        f"⏹ Тест остановлен.\n"
+        f"Отвечено: {answered} из {total}\n"
+        f"Верных ответов: {correct}\n"
+        f"Баланс: {balance} 🌐",
+        reply_markup=after_series_kb(),
+    )
