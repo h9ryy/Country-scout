@@ -29,6 +29,19 @@ async def init_db() -> None:
             )
             """
         )
+        await db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS series_history (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id     INTEGER NOT NULL,
+                continent   TEXT    NOT NULL,
+                level       INTEGER NOT NULL,
+                correct     INTEGER NOT NULL,
+                total       INTEGER NOT NULL,
+                finished_at TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
         await db.commit()
 
 
@@ -156,3 +169,32 @@ async def get_mastered(user_id: int) -> list[tuple[str, int]]:
         )
         rows = await cur.fetchall()
     return [(r[0], r[1]) for r in rows]
+
+async def record_series(
+    user_id: int, continent: str, level: int, correct: int, total: int
+) -> None:
+    """Записывает завершённую серию в историю."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """
+            INSERT INTO series_history (user_id, continent, level, correct, total)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (user_id, continent, level, correct, total),
+        )
+        await db.commit()
+
+
+async def get_series_stats(user_id: int) -> tuple[int, float]:
+    """Возвращает (число тестов, средний процент верных ответов за тест)."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """
+            SELECT COUNT(*), AVG(correct * 100.0 / total)
+            FROM series_history
+            WHERE user_id = ? AND total > 0
+            """,
+            (user_id,),
+        )
+        row = await cur.fetchone()
+    return row[0], row[1] or 0.0

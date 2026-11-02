@@ -1,33 +1,56 @@
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 
 from bot.game import CONTINENTS, LEVELS
-from bot.storage import get_mastered, get_stats
+from bot.keyboards import profile_kb
+from bot.storage import get_mastered, get_series_stats, get_stats
 
 router = Router()
 
 
-@router.message(Command("globes"))
-async def cmd_globes(message: Message) -> None:
-    user_id = message.from_user.id
-    globes, correct, wrong = await get_stats(user_id)
-    total = correct + wrong
-    percent = round(correct / total * 100) if total else 0
+def _mastered_text(mastered: list[tuple[str, int]]) -> str:
+    """Европа · Лёгкий, Средний, Сложный (каждый материк в своей строке)."""
+    by_continent: dict[str, list[str]] = {}
+    for continent, level in mastered:
+        by_continent.setdefault(continent, []).append(LEVELS.get(str(level), str(level)))
 
-    text = (
-        f"🌐 Твой баланс: {globes}\n"
+    lines = [
+        f"{CONTINENTS.get(continent, continent)} · {', '.join(levels)}"
+        for continent, levels in by_continent.items()
+    ]
+    if not lines:
+        return "🎓 Освоено: пока ничего"
+    if len(lines) == 1:
+        return f"🎓 Освоено: {lines[0]}"
+    return "🎓 Освоено:\n" + "\n".join(lines)
+
+
+async def build_profile_text(user_id: int) -> str:
+    globes, correct, wrong = await get_stats(user_id)
+    tests, avg = await get_series_stats(user_id)
+    mastered = await get_mastered(user_id)
+
+    avg_text = f"{round(avg)}%" if tests else "—"
+    return (
+        "👤 Профиль\n"
+        f"🌐 Глобусов: {globes}\n"
+        f"📝 Тестов решено: {tests}\n"
+        f"🎯 Средний результат: {avg_text}\n"
         f"✅ Верных ответов: {correct}\n"
         f"❌ Ошибок: {wrong}\n"
-        f"🎯 Точность: {percent}%"
+        f"{_mastered_text(mastered)}"
     )
 
-    mastered = await get_mastered(user_id)
-    if mastered:
-        lines = [
-            f"• {CONTINENTS.get(continent, continent)} · {LEVELS.get(str(level), level)}"
-            for continent, level in mastered
-        ]
-        text += "\n\n🎓 Освоено:\n" + "\n".join(lines)
 
-    await message.answer(text)
+@router.message(Command("profile", "globes"))
+async def cmd_profile(message: Message) -> None:
+    text = await build_profile_text(message.from_user.id)
+    await message.answer(text, reply_markup=profile_kb())
+
+
+@router.callback_query(F.data == "profile")
+async def show_profile(callback: CallbackQuery) -> None:
+    text = await build_profile_text(callback.from_user.id)
+    await callback.message.answer(text, reply_markup=profile_kb())
+    await callback.answer()

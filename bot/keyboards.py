@@ -17,6 +17,7 @@ def continents_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for key, name in CONTINENTS.items():
         kb.button(text=f"🌍 {name}", callback_data=f"cont:{key}")
+    kb.button(text="👤 Профиль", callback_data="profile")
     kb.adjust(1)
     return kb.as_markup()
 
@@ -56,6 +57,12 @@ def options_kb(options: list[dict]) -> InlineKeyboardMarkup:
 def after_series_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.button(text="🔁 Играть ещё", callback_data="again")
+    kb.button(text="👤 Профиль", callback_data="profile")
     kb.button(text="🏠 В меню", callback_data="menu")
     kb.adjust(1)
+    return kb.as_markup()
+
+def profile_kb() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🏠 В меню", callback_data="menu")
     return kb.as_markup()

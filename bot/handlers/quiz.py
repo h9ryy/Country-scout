@@ -6,7 +6,13 @@ from aiogram.types import CallbackQuery, FSInputFile, Message
 
 from bot.game import BY_CODE, is_correct, make_question, new_series
 from bot.keyboards import after_series_kb, continents_kb, options_kb
-from bot.storage import add_answer, get_balance, get_progress, record_perfect_run
+from bot.storage import (
+    add_answer,
+    get_balance,
+    get_progress,
+    record_perfect_run,
+    record_series,
+)
 from config import PERFECT_RUNS_TO_MASTER
 
 router = Router()
@@ -126,6 +132,7 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
 
     # Серия дошла до конца: обновляем прогресс уровня
     continent, level = data["continent"], data["level"]
+    await record_series(user.id, continent, level, correct, total)
     if scored and errors == 0:
         runs, mastered_now = await record_perfect_run(user.id, continent, level)
     else:

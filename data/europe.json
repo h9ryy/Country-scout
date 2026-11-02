@@ -277,6 +277,68 @@
       "name": "Косово",
       "continent": "europe",
       "level": 3
+    },
+
+    
+    {
+      "code": "cy",
+      "name": "Кипр",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "fo",
+      "name": "Фарерские острова",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "gi",
+      "name": "Гибралтар",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "gg",
+      "name": "Гернси",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "je",
+      "name": "Джерси",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "im",
+      "name": "Остров Мэн",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "gb-sct",
+      "name": "Шотландия",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "gb-wls",
+      "name": "Уэльс",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "gb-eng",
+      "name": "Англия",
+      "continent": "europe",
+      "level": 3
+    },
+    {
+      "code": "gb-nir",
+      "name": "Северная Ирландия",
+      "continent": "europe",
+      "level": 3
     }
   ]
 }
