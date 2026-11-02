@@ -6,7 +6,8 @@ from aiogram.types import CallbackQuery, FSInputFile, Message
 
 from bot.game import BY_CODE, is_correct, make_question, new_series
 from bot.keyboards import after_series_kb, continents_kb, options_kb
-from bot.storage import add_answer, get_balance
+from bot.storage import add_answer, get_balance, get_progress, record_perfect_run
+from config import PERFECT_RUNS_TO_MASTER
 
 router = Router()
 
@@ -38,11 +39,29 @@ async def send_question(message: Message, state: FSMContext) -> None:
         _file_ids[code] = sent.photo[-1].file_id
 
 
-async def start_series(message: Message, state: FSMContext) -> None:
-    """Запускает новую серию с материком и уровнем из состояния."""
+async def start_series(message: Message, state: FSMContext, user_id: int) -> None:
+    """Запускает серию. Решение «начислять очки или нет» принимается здесь,
+    один раз на всю серию."""
     data = await state.get_data()
-    series = new_series(data["continent"], data["level"])
-    await state.update_data(series=series, index=0, correct=0, current=None)
+    continent, level = data["continent"], data["level"]
+
+    _, mastered = await get_progress(user_id, continent, level)
+
+    series = new_series(continent, level)
+    await state.update_data(
+        series=series,
+        index=0,
+        correct=0,
+        errors=0,
+        scored=not mastered,
+        current=None,
+    )
+
+    if mastered:
+        await message.answer(
+            "🎓 Этот уровень уже освоен.\n"
+            "Играй для тренировки: очки не начисляются и не списываются."
+        )
     await send_question(message, state)
 
 
@@ -62,23 +81,31 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
 
     chosen = callback.data.split(":", 1)[1]
     ok = is_correct(current, chosen)
+    scored = data.get("scored", True)
 
     user = callback.from_user
     old_balance = await get_balance(user.id)
-    balance = await add_answer(user.id, user.username, ok)
+    balance = await add_answer(user.id, user.username, ok, scored=scored)
     gained = balance - old_balance
 
     name = BY_CODE[current]["name"]
     index = data["index"]
     total = len(data["series"])
     correct = data["correct"] + (1 if ok else 0)
+    errors = data.get("errors", 0) + (0 if ok else 1)
 
     if ok:
-        result = f"✅ Верно! Это {name}.\n+{gained} 🌐"
+        result = f"✅ Верно! Это {name}."
+        result += f"\n+{gained} 🌐" if scored else "\n🎓 Тренировка: очки не начисляются"
     else:
         chosen_name = BY_CODE.get(chosen, {}).get("name", "другая страна")
-        change = f"{gained} 🌐" if gained else "Баланс не меняется: ниже 0 не опускаемся"
-        result = f"❌ Неверно: это {name}, а не {chosen_name}.\n{change}"
+        result = f"❌ Неверно: это {name}, а не {chosen_name}."
+        if not scored:
+            result += "\n🎓 Тренировка: очки не списываются"
+        elif gained:
+            result += f"\n{gained} 🌐"
+        else:
+            result += "\nБаланс не меняется: ниже 0 не опускаемся"
 
     edit = callback.message.edit_caption(
         caption=f"Вопрос {index + 1} из {total}\n{result}\nБаланс: {balance} 🌐",
@@ -86,19 +113,36 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
     )
 
     index += 1
-    await state.update_data(index=index, correct=correct)
+    await state.update_data(index=index, correct=correct, errors=errors)
 
     if index < total:
         # Обновление подписи и отправка следующего флага идут одновременно
         await asyncio.gather(_await(edit), send_question(callback.message, state))
+        return
+
+    await edit
+
+    # Серия дошла до конца: обновляем прогресс уровня
+    continent, level = data["continent"], data["level"]
+    if scored and errors == 0:
+        runs, mastered_now = await record_perfect_run(user.id, continent, level)
     else:
-        await edit
-        await callback.message.answer(
-            f"🏁 Серия окончена!\n"
-            f"Верных ответов: {correct} из {total}\n"
-            f"Баланс: {balance} 🌐",
-            reply_markup=after_series_kb(),
-        )
+        runs, mastered_now = await get_progress(user.id, continent, level)
+
+    if mastered_now and scored:
+        note = "🎓 Уровень освоен! Очки за него больше не начисляются."
+    elif mastered_now:
+        note = "🎓 Уровень освоен: это была тренировка."
+    else:
+        note = f"⭐ Безошибочных серий: {runs} из {PERFECT_RUNS_TO_MASTER}"
+
+    await callback.message.answer(
+        f"🏁 Серия окончена!\n"
+        f"Верных ответов: {correct} из {total}\n"
+        f"Баланс: {balance} 🌐\n"
+        f"{note}",
+        reply_markup=after_series_kb(),
+    )
 
 
 @router.callback_query(F.data == "again")
@@ -107,9 +151,10 @@ async def play_again(callback: CallbackQuery, state: FSMContext) -> None:
     if "continent" not in data or "level" not in data:
         await callback.message.answer("Выбери материк:", reply_markup=continents_kb())
     else:
-        await start_series(callback.message, state)
+        await start_series(callback.message, state, callback.from_user.id)
     await callback.answer()
-    
+
+
 @router.callback_query(F.data == "stop")
 async def stop_test(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()

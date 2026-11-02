@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.game import CONTINENTS, LEVELS, SERIES_BY_LEVEL, get_pool
+from config import PERFECT_RUNS_TO_MASTER
 
 
 def _questions_word(n: int) -> str:
@@ -20,15 +21,23 @@ def continents_kb() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-def levels_kb(continent: str) -> InlineKeyboardMarkup:
+def levels_kb(
+    continent: str, progress: dict[int, tuple[int, bool]]
+) -> InlineKeyboardMarkup:
+    """progress[уровень] = (безошибочных серий, освоен ли уровень)."""
     kb = InlineKeyboardBuilder()
     for level, name in LEVELS.items():
         pool = get_pool(continent, int(level))
         n = min(SERIES_BY_LEVEL[int(level)], len(pool))  # сколько реально вопросов
-        kb.button(
-            text=f"{name} · {n} {_questions_word(n)}",
-            callback_data=f"lvl:{level}",
-        )
+        text = f"{name} · {n} {_questions_word(n)}"
+
+        runs, mastered = progress.get(int(level), (0, False))
+        if mastered:
+            text += " · ✅ освоено"
+        elif runs > 0:
+            text += f" · ⭐ {runs}/{PERFECT_RUNS_TO_MASTER}"
+
+        kb.button(text=text, callback_data=f"lvl:{level}")
     kb.button(text="⬅️ Назад", callback_data="menu")
     kb.adjust(1)
     return kb.as_markup()

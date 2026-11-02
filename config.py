@@ -25,3 +25,5 @@ FLAGS_DIR = BASE_DIR / "flags"
 # Очки (глобусы 🌐)
 SCORE_CORRECT = 3
 SCORE_WRONG = -1
+# Сколько безошибочных серий нужно, чтобы уровень считался освоенным
+PERFECT_RUNS_TO_MASTER = 2

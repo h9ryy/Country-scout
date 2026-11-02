@@ -1,6 +1,6 @@
 import aiosqlite
 
-from config import DB_PATH, SCORE_CORRECT, SCORE_WRONG
+from config import DB_PATH, PERFECT_RUNS_TO_MASTER, SCORE_CORRECT, SCORE_WRONG
 
 
 async def init_db() -> None:
@@ -17,6 +17,18 @@ async def init_db() -> None:
             )
             """
         )
+        await db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS level_progress (
+                user_id      INTEGER NOT NULL,
+                continent    TEXT    NOT NULL,
+                level        INTEGER NOT NULL,
+                perfect_runs INTEGER NOT NULL DEFAULT 0,
+                mastered     INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY (user_id, continent, level)
+            )
+            """
+        )
         await db.commit()
 
 
@@ -29,9 +41,20 @@ async def get_balance(user_id: int) -> int:
     return row[0] if row else 0
 
 
-async def add_answer(user_id: int, username: str | None, is_correct: bool) -> int:
-    """Начисляет очки за ответ и возвращает новый баланс (не ниже 0)."""
-    delta = SCORE_CORRECT if is_correct else SCORE_WRONG
+async def add_answer(
+    user_id: int,
+    username: str | None,
+    is_correct: bool,
+    scored: bool = True,
+) -> int:
+    """Записывает ответ и возвращает новый баланс (не ниже 0).
+
+    scored=False: глобусы не меняются ни в плюс, ни в минус
+    (освоенный уровень), но счётчики верных/неверных растут.
+    """
+    delta = 0
+    if scored:
+        delta = SCORE_CORRECT if is_correct else SCORE_WRONG
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             "INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)",
@@ -65,3 +88,68 @@ async def get_stats(user_id: int) -> tuple[int, int, int]:
         )
         row = await cur.fetchone()
     return tuple(row) if row else (0, 0, 0)
+
+
+async def get_progress(user_id: int, continent: str, level: int) -> tuple[int, bool]:
+    """Возвращает (безошибочных серий, освоен ли уровень)."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """
+            SELECT perfect_runs, mastered FROM level_progress
+            WHERE user_id = ? AND continent = ? AND level = ?
+            """,
+            (user_id, continent, level),
+        )
+        row = await cur.fetchone()
+    return (row[0], bool(row[1])) if row else (0, False)
+
+
+async def record_perfect_run(
+    user_id: int, continent: str, level: int
+) -> tuple[int, bool]:
+    """Засчитывает безошибочную серию. Возвращает (серий, освоен ли уровень).
+
+    На уже освоенном уровне счётчик не растёт.
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """
+            INSERT OR IGNORE INTO level_progress (user_id, continent, level)
+            VALUES (?, ?, ?)
+            """,
+            (user_id, continent, level),
+        )
+        await db.execute(
+            """
+            UPDATE level_progress
+            SET perfect_runs = perfect_runs + 1,
+                mastered = CASE WHEN perfect_runs + 1 >= ? THEN 1 ELSE 0 END
+            WHERE user_id = ? AND continent = ? AND level = ? AND mastered = 0
+            """,
+            (PERFECT_RUNS_TO_MASTER, user_id, continent, level),
+        )
+        await db.commit()
+        cur = await db.execute(
+            """
+            SELECT perfect_runs, mastered FROM level_progress
+            WHERE user_id = ? AND continent = ? AND level = ?
+            """,
+            (user_id, continent, level),
+        )
+        row = await cur.fetchone()
+    return row[0], bool(row[1])
+
+
+async def get_mastered(user_id: int) -> list[tuple[str, int]]:
+    """Список освоенных уровней игрока: [(материк, уровень), ...]."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            """
+            SELECT continent, level FROM level_progress
+            WHERE user_id = ? AND mastered = 1
+            ORDER BY continent, level
+            """,
+            (user_id,),
+        )
+        rows = await cur.fetchall()
+    return [(r[0], r[1]) for r in rows]

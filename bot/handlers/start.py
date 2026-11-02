@@ -6,6 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from bot.handlers.quiz import start_series
 from bot.game import CONTINENTS, LEVELS
 from bot.keyboards import continents_kb, levels_kb
+from bot.storage import get_progress
 
 router = Router()
 
@@ -36,9 +37,16 @@ async def choose_continent(callback: CallbackQuery, state: FSMContext) -> None:
         await callback.answer("Такого материка нет", show_alert=True)
         return
     await state.update_data(continent=continent)
+
+    user_id = callback.from_user.id
+    progress = {
+        int(level): await get_progress(user_id, continent, int(level))
+        for level in LEVELS
+    }
+
     await callback.message.edit_text(
         f"{CONTINENTS[continent]}. Выбери уровень:",
-        reply_markup=levels_kb(continent),
+        reply_markup=levels_kb(continent, progress),
     )
     await callback.answer()
 
@@ -62,4 +70,4 @@ async def choose_level(callback: CallbackQuery, state: FSMContext) -> None:
         f"✅ {CONTINENTS[continent]} · {LEVELS[level]}\nПоехали! 🚀"
     )
     await callback.answer()
-    await start_series(callback.message, state)
+    await start_series(callback.message, state, callback.from_user.id)

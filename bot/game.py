@@ -6,7 +6,7 @@ from pathlib import Path
 from config import EUROPE_JSON, FLAGS_DIR
 
 SERIES_BY_LEVEL = {1: 10, 2: 15, 3: 20}   # вопросов в одной серии
-OPTIONS_BY_LEVEL = {1: 3, 2: 4, 3: 4}  # сколько вариантов ответа на уровне
+OPTIONS_BY_LEVEL = {1: 3, 2: 4, 3: 5}  # сколько вариантов ответа на уровне
 
 with open(EUROPE_JSON, encoding="utf-8") as f:
     _DATA = json.load(f)
