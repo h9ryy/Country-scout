@@ -198,3 +198,17 @@ async def get_series_stats(user_id: int) -> tuple[int, float]:
         )
         row = await cur.fetchone()
     return row[0], row[1] or 0.0
+
+async def revert_points(user_id: int, delta: int) -> int:
+    """Отменяет очки серии: вычитает сумму реальных изменений баланса."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE players SET globes = MAX(0, globes - ?) WHERE user_id = ?",
+            (delta, user_id),
+        )
+        await db.commit()
+        cur = await db.execute(
+            "SELECT globes FROM players WHERE user_id = ?", (user_id,)
+        )
+        row = await cur.fetchone()
+    return row[0] if row else 0

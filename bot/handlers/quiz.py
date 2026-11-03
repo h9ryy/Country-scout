@@ -12,6 +12,7 @@ from bot.storage import (
     get_progress,
     record_perfect_run,
     record_series,
+    revert_points,
 )
 from config import PERFECT_RUNS_TO_MASTER
 
@@ -59,6 +60,7 @@ async def start_series(message: Message, state: FSMContext, user_id: int) -> Non
         index=0,
         correct=0,
         errors=0,
+        series_delta=0,
         scored=not mastered,
         current=None,
     )
@@ -101,6 +103,7 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
     total = len(data["series"])
     correct = data["correct"] + (1 if ok else 0)
     errors = data.get("errors", 0) + (0 if ok else 1)
+    series_delta = data.get("series_delta", 0) + gained
 
     if ok:
         result = f"✅ Верно! Это {name}."
@@ -121,7 +124,9 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
     )
 
     index += 1
-    await state.update_data(index=index, correct=correct, errors=errors)
+    await state.update_data(
+        index=index, correct=correct, errors=errors, series_delta=series_delta
+    )
 
     if index < total:
         # Обновление подписи и отправка следующего флага идут одновременно
@@ -180,6 +185,7 @@ async def stop_test(callback: CallbackQuery, state: FSMContext) -> None:
     answered = data["index"]
     total = len(data["series"])
     correct = data["correct"]
+    delta = data.get("series_delta", 0)
 
     # Убираем кнопки у текущего вопроса и помечаем его
     await callback.message.edit_caption(
@@ -187,11 +193,25 @@ async def stop_test(callback: CallbackQuery, state: FSMContext) -> None:
         reply_markup=None,
     )
 
-    balance = await get_balance(callback.from_user.id)
+    # Возвращаем баланс к тому, каким он был до теста
+    user_id = callback.from_user.id
+    if delta:
+        balance = await revert_points(user_id, delta)
+    else:
+        balance = await get_balance(user_id)
+
+    if delta > 0:
+        refund = f"↩️ Очки за этот тест отменены: −{delta} 🌐\n"
+    elif delta < 0:
+        refund = f"↩️ Потери за этот тест отменены: +{-delta} 🌐\n"
+    else:
+        refund = ""
+
     await callback.message.answer(
         f"⏹ Тест остановлен.\n"
         f"Отвечено: {answered} из {total}\n"
         f"Верных ответов: {correct}\n"
+        f"{refund}"
         f"Баланс: {balance} 🌐",
         reply_markup=after_series_kb(),
     )
