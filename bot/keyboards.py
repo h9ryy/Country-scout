@@ -4,6 +4,10 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bot.game import CONTINENTS, LEVELS, SERIES_BY_LEVEL, get_pool
 from config import PERFECT_RUNS_TO_MASTER
 
+# Материки, которые готовятся: кнопка есть, игра пока недоступна.
+# Когда появятся данные, материк убираем отсюда.
+COMING_SOON = {"asia": "Азия"}
+
 
 def _questions_word(n: int) -> str:
     if n % 10 == 1 and n % 100 != 11:
@@ -13,11 +17,23 @@ def _questions_word(n: int) -> str:
     return "вопросов"
 
 
+def main_menu_kb() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🌍 Страны", callback_data="countries")
+    kb.button(text="👤 Профиль", callback_data="profile")
+    kb.button(text="📖 Система очков", callback_data="rules")
+    kb.adjust(1)
+    return kb.as_markup()
+
+
 def continents_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for key, name in CONTINENTS.items():
         kb.button(text=f"🌍 {name}", callback_data=f"cont:{key}")
-    kb.button(text="👤 Профиль", callback_data="profile")
+    for key, name in COMING_SOON.items():
+        if key not in CONTINENTS:
+            kb.button(text=f"🌏 {name} · скоро", callback_data=f"soon:{key}")
+    kb.button(text="⬅️ Назад", callback_data="menu")
     kb.adjust(1)
     return kb.as_markup()
 
@@ -39,13 +55,13 @@ def levels_kb(
             text += f" · ⭐ {runs}/{PERFECT_RUNS_TO_MASTER}"
 
         kb.button(text=text, callback_data=f"lvl:{level}")
-    kb.button(text="⬅️ Назад", callback_data="menu")
+    kb.button(text="⬅️ Назад", callback_data="countries")
     kb.adjust(1)
     return kb.as_markup()
 
 
 def options_kb(options: list[dict]) -> InlineKeyboardMarkup:
-    """Кнопки с названиями стран + кнопка остановки теста."""
+    """Кнопки с названиями + кнопка остановки теста."""
     kb = InlineKeyboardBuilder()
     for country in options:
         kb.button(text=country["name"], callback_data=f"ans:{country['code']}")
@@ -62,7 +78,16 @@ def after_series_kb() -> InlineKeyboardMarkup:
     kb.adjust(1)
     return kb.as_markup()
 
+
 def profile_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.button(text="🏠 В меню", callback_data="menu")
+    return kb.as_markup()
+
+
+def rules_kb() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🌍 Играть", callback_data="countries")
+    kb.button(text="🏠 В меню", callback_data="menu")
+    kb.adjust(1)
     return kb.as_markup()

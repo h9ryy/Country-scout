@@ -25,10 +25,10 @@ class Question:
 
 
 def get_pool(continent: str, level: int) -> list[dict]:
-    """Страны материка, доступные на этом уровне (уровни накопительные)."""
+    """Страны материка именно этого уровня."""
     return [
         c for c in COUNTRIES
-        if c["continent"] == continent and c["level"] <= level
+        if c["continent"] == continent and c["level"] == level
     ]
 
 

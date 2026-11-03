@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, FSInputFile, Message
 
 from bot.game import BY_CODE, is_correct, make_question, new_series
-from bot.keyboards import after_series_kb, continents_kb, options_kb
+from bot.keyboards import after_series_kb, main_menu_kb, options_kb
 from bot.storage import (
     add_answer,
     get_balance,
@@ -39,7 +39,7 @@ async def send_question(message: Message, state: FSMContext) -> None:
     photo = _file_ids.get(code) or FSInputFile(question.flag_path)
     sent = await message.answer_photo(
         photo,
-        caption=f"Вопрос {index + 1} из {total}\nКакая это страна?",
+        caption=f"Вопрос {index + 1} из {total}\nЧей это флаг?",
         reply_markup=options_kb(question.options),
     )
     if code not in _file_ids:
@@ -163,7 +163,7 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
 async def play_again(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     if "continent" not in data or "level" not in data:
-        await callback.message.answer("Выбери материк:", reply_markup=continents_kb())
+        await callback.message.answer("🏠 Главное меню\nВыбери раздел:", reply_markup=main_menu_kb())
     else:
         await start_series(callback.message, state, callback.from_user.id)
     await callback.answer()

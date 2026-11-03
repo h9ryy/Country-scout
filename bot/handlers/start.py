@@ -5,39 +5,47 @@ from aiogram.types import CallbackQuery, Message
 
 from bot.game import CONTINENTS, LEVELS
 from bot.handlers.quiz import start_series
-from bot.keyboards import continents_kb, levels_kb
+from bot.keyboards import COMING_SOON, continents_kb, levels_kb, main_menu_kb
 from bot.storage import get_progress
-from config import SCORES_BY_LEVEL
 
 router = Router()
 
 WELCOME = (
-    "🌍 Привет! Угадывай страны по флагам и зарабатывай глобусы 🌐.\n"
+    "🌍 Привет! Угадывай флаги мира и зарабатывай глобусы 🌐.\n"
     "Очки зависят от уровня: чем сложнее, тем дороже ошибка.\n\n"
-    "Выбери материк:"
+    "Выбери раздел:"
 )
-
-
-def _rules_text() -> str:
-    """Блок «верно / ошибка» по уровням, берётся из config.py."""
-    lines = []
-    for level, name in LEVELS.items():
-        reward, penalty = SCORES_BY_LEVEL[int(level)]
-        lines.append(f"{name}: +{reward} / −{abs(penalty)} 🌐")
-    return "\n".join(lines)
+MENU_TEXT = "🏠 Главное меню\nВыбери раздел:"
 
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext) -> None:
     await state.clear()
-    await message.answer(WELCOME, reply_markup=continents_kb())
+    await message.answer(WELCOME, reply_markup=main_menu_kb())
 
 
 @router.callback_query(F.data == "menu")
 async def back_to_menu(callback: CallbackQuery, state: FSMContext) -> None:
     await state.clear()
-    await callback.message.answer("Выбери материк:", reply_markup=continents_kb())
+    await callback.message.answer(MENU_TEXT, reply_markup=main_menu_kb())
     await callback.answer()
+
+
+@router.callback_query(F.data == "countries")
+async def show_countries(callback: CallbackQuery) -> None:
+    await callback.message.edit_text(
+        "🌍 Выбери материк:", reply_markup=continents_kb()
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith("soon:"))
+async def coming_soon(callback: CallbackQuery) -> None:
+    key = callback.data.split(":", 1)[1]
+    name = COMING_SOON.get(key, "Этот раздел")
+    await callback.answer(
+        f"🌏 {name} скоро появится: мы уже готовим флаги!", show_alert=True
+    )
 
 
 @router.callback_query(F.data.startswith("cont:"))
@@ -55,8 +63,7 @@ async def choose_continent(callback: CallbackQuery, state: FSMContext) -> None:
     }
 
     await callback.message.edit_text(
-        f"{CONTINENTS[continent]}. Выбери уровень:\n\n"
-        f"За верный ответ / за ошибку:\n{_rules_text()}",
+        f"{CONTINENTS[continent]}. Выбери уровень:",
         reply_markup=levels_kb(continent, progress),
     )
     await callback.answer()
