@@ -19,7 +19,7 @@ def _questions_word(n: int) -> str:
 
 def main_menu_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.button(text="🌍 Страны", callback_data="countries")
+    kb.button(text="🌍 Флаги", callback_data="countries")
     kb.button(text="👤 Профиль", callback_data="profile")
     kb.button(text="📖 Система очков", callback_data="rules")
     kb.adjust(1)
