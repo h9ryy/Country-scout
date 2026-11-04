@@ -5,6 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from bot.game import CONTINENTS, LEVELS
 from bot.keyboards import profile_kb
 from bot.storage import get_mastered, get_series_stats, get_stats
+from bot.ui import new_screen, replace_screen
 
 router = Router()
 
@@ -46,11 +47,11 @@ async def build_profile_text(user_id: int) -> str:
 @router.message(Command("profile", "globes"))
 async def cmd_profile(message: Message) -> None:
     text = await build_profile_text(message.from_user.id)
-    await message.answer(text, reply_markup=profile_kb())
+    await new_screen(message, text, profile_kb(), delete_user_message=True)
 
 
 @router.callback_query(F.data == "profile")
 async def show_profile(callback: CallbackQuery) -> None:
     text = await build_profile_text(callback.from_user.id)
-    await callback.message.answer(text, reply_markup=profile_kb())
+    await replace_screen(callback.message, text, profile_kb())
     await callback.answer()

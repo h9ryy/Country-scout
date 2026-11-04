@@ -1,10 +1,9 @@
-import asyncio
 import json
 
 from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, FSInputFile, Message
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto, Message
 
 from bot.game import BY_CODE, is_correct, make_question, new_series
 from bot.keyboards import after_series_kb, main_menu_kb, options_kb
@@ -16,6 +15,7 @@ from bot.storage import (
     record_series,
     revert_points,
 )
+from bot.ui import remember, replace_screen, safe_delete
 from config import BASE_DIR, PERFECT_RUNS_TO_MASTER
 
 router = Router()
@@ -40,12 +40,14 @@ def _save_cache() -> None:
 _file_ids: dict[str, str] = _load_cache()
 
 
-async def _await(method) -> None:
-    """Обёртка: asyncio.gather не принимает методы aiogram напрямую."""
-    await method
+async def send_question(
+    message: Message, state: FSMContext, header: str = ""
+) -> None:
+    """Показывает следующий флаг.
 
-
-async def send_question(message: Message, state: FSMContext) -> None:
+    Серия идёт в одном сообщении: картинка заменяется на следующую,
+    а результат прошлого ответа (header) пишется над вопросом.
+    """
     data = await state.get_data()
     index = data["index"]
     total = len(data["series"])
@@ -55,28 +57,49 @@ async def send_question(message: Message, state: FSMContext) -> None:
     await state.update_data(current=code)
 
     caption = f"Вопрос {index + 1} из {total}\nЧей это флаг?"
+    if header:
+        caption = f"{header}\n\n{caption}"
     markup = options_kb(question.options)
 
     cached = _file_ids.get(code)
-    try:
-        sent = await message.answer_photo(
-            cached or FSInputFile(question.flag_path),
-            caption=caption,
-            reply_markup=markup,
-        )
-    except TelegramBadRequest:
-        if cached is None:
-            raise
-        # file_id устарел: загружаем файл заново
-        sent = await message.answer_photo(
-            FSInputFile(question.flag_path), caption=caption, reply_markup=markup
-        )
+    fresh = FSInputFile(question.flag_path)
 
-    if sent.photo:
-        new_id = sent.photo[-1].file_id
-        if _file_ids.get(code) != new_id:
-            _file_ids[code] = new_id
-            _save_cache()
+    if message.photo:
+        # Серия уже идёт: меняем картинку в том же сообщении
+        try:
+            sent = await message.edit_media(
+                media=InputMediaPhoto(media=cached or fresh, caption=caption),
+                reply_markup=markup,
+            )
+        except TelegramBadRequest:
+            if cached is None:
+                raise
+            # file_id устарел: загружаем файл заново
+            sent = await message.edit_media(
+                media=InputMediaPhoto(media=fresh, caption=caption),
+                reply_markup=markup,
+            )
+    else:
+        # Первый вопрос: на месте меню появляется флаг
+        try:
+            sent = await message.answer_photo(
+                cached or fresh, caption=caption, reply_markup=markup
+            )
+        except TelegramBadRequest:
+            if cached is None:
+                raise
+            sent = await message.answer_photo(
+                fresh, caption=caption, reply_markup=markup
+            )
+        await safe_delete(message)
+
+    if isinstance(sent, Message):
+        remember(sent)
+        if sent.photo:
+            new_id = sent.photo[-1].file_id
+            if _file_ids.get(code) != new_id:
+                _file_ids[code] = new_id
+                _save_cache()
 
 
 async def start_series(message: Message, state: FSMContext, user_id: int) -> None:
@@ -98,12 +121,13 @@ async def start_series(message: Message, state: FSMContext, user_id: int) -> Non
         current=None,
     )
 
+    header = ""
     if mastered:
-        await message.answer(
-            "🎓 Этот уровень уже освоен.\n"
-            "Играй для тренировки: очки не начисляются и не списываются."
+        header = (
+            "🎓 Этот уровень уже освоен: это тренировка, "
+            "очки не начисляются и не списываются."
         )
-    await send_question(message, state)
+    await send_question(message, state, header=header)
 
 
 @router.callback_query(F.data.startswith("ans:"))
@@ -150,11 +174,7 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
             result += f"\n{gained} 🌐"
         else:
             result += "\nБаланс не меняется: ниже 0 не опускаемся"
-
-    edit = callback.message.edit_caption(
-        caption=f"Вопрос {index + 1} из {total}\n{result}\nБаланс: {balance} 🌐",
-        reply_markup=None,
-    )
+    feedback = f"{result}\nБаланс: {balance} 🌐"
 
     index += 1
     await state.update_data(
@@ -162,11 +182,9 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
     )
 
     if index < total:
-        # Обновление подписи и отправка следующего флага идут одновременно
-        await asyncio.gather(_await(edit), send_question(callback.message, state))
+        # Следующий флаг на месте предыдущего, результат ответа над вопросом
+        await send_question(callback.message, state, header=feedback)
         return
-
-    await edit
 
     # Серия дошла до конца: обновляем прогресс уровня
     continent, level = data["continent"], data["level"]
@@ -183,12 +201,14 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
     else:
         note = f"⭐ Безошибочных серий: {runs} из {PERFECT_RUNS_TO_MASTER}"
 
-    await callback.message.answer(
+    # Флаг заменяется итогами серии
+    await replace_screen(
+        callback.message,
+        f"{feedback}\n\n"
         f"🏁 Серия окончена!\n"
         f"Верных ответов: {correct} из {total}\n"
-        f"Баланс: {balance} 🌐\n"
         f"{note}",
-        reply_markup=after_series_kb(),
+        after_series_kb(),
     )
 
 
@@ -196,7 +216,9 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
 async def play_again(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     if "continent" not in data or "level" not in data:
-        await callback.message.answer("🏠 Главное меню\nВыбери раздел:", reply_markup=main_menu_kb())
+        await replace_screen(
+            callback.message, "🏠 Главное меню\nВыбери раздел:", main_menu_kb()
+        )
     else:
         await start_series(callback.message, state, callback.from_user.id)
     await callback.answer()
@@ -220,12 +242,6 @@ async def stop_test(callback: CallbackQuery, state: FSMContext) -> None:
     correct = data["correct"]
     delta = data.get("series_delta", 0)
 
-    # Убираем кнопки у текущего вопроса и помечаем его
-    await callback.message.edit_caption(
-        caption=f"{callback.message.caption or ''}\n⏹ Остановлено",
-        reply_markup=None,
-    )
-
     # Возвращаем баланс к тому, каким он был до теста
     user_id = callback.from_user.id
     if delta:
@@ -240,11 +256,13 @@ async def stop_test(callback: CallbackQuery, state: FSMContext) -> None:
     else:
         refund = ""
 
-    await callback.message.answer(
+    # Флаг заменяется итогом остановки
+    await replace_screen(
+        callback.message,
         f"⏹ Тест остановлен.\n"
         f"Отвечено: {answered} из {total}\n"
         f"Верных ответов: {correct}\n"
         f"{refund}"
         f"Баланс: {balance} 🌐",
-        reply_markup=after_series_kb(),
+        after_series_kb(),
     )
