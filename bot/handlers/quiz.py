@@ -1,6 +1,8 @@
 import asyncio
+import json
 
 from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, FSInputFile, Message
 
@@ -14,12 +16,28 @@ from bot.storage import (
     record_series,
     revert_points,
 )
-from config import PERFECT_RUNS_TO_MASTER
+from config import BASE_DIR, PERFECT_RUNS_TO_MASTER
 
 router = Router()
 
-# Кэш: код страны -> file_id картинки в Telegram (флаг грузится один раз)
-_file_ids: dict[str, str] = {}
+# Кэш: код страны -> file_id картинки в Telegram. Хранится в файле,
+# поэтому флаги не загружаются заново после перезапуска бота.
+CACHE_PATH = BASE_DIR / "cache" / "file_ids.json"
+
+
+def _load_cache() -> dict[str, str]:
+    try:
+        return json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def _save_cache() -> None:
+    CACHE_PATH.parent.mkdir(exist_ok=True)
+    CACHE_PATH.write_text(json.dumps(_file_ids), encoding="utf-8")
+
+
+_file_ids: dict[str, str] = _load_cache()
 
 
 async def _await(method) -> None:
@@ -36,14 +54,29 @@ async def send_question(message: Message, state: FSMContext) -> None:
     question = make_question(code, data["continent"], data["level"])
     await state.update_data(current=code)
 
-    photo = _file_ids.get(code) or FSInputFile(question.flag_path)
-    sent = await message.answer_photo(
-        photo,
-        caption=f"Вопрос {index + 1} из {total}\nЧей это флаг?",
-        reply_markup=options_kb(question.options),
-    )
-    if code not in _file_ids:
-        _file_ids[code] = sent.photo[-1].file_id
+    caption = f"Вопрос {index + 1} из {total}\nЧей это флаг?"
+    markup = options_kb(question.options)
+
+    cached = _file_ids.get(code)
+    try:
+        sent = await message.answer_photo(
+            cached or FSInputFile(question.flag_path),
+            caption=caption,
+            reply_markup=markup,
+        )
+    except TelegramBadRequest:
+        if cached is None:
+            raise
+        # file_id устарел: загружаем файл заново
+        sent = await message.answer_photo(
+            FSInputFile(question.flag_path), caption=caption, reply_markup=markup
+        )
+
+    if sent.photo:
+        new_id = sent.photo[-1].file_id
+        if _file_ids.get(code) != new_id:
+            _file_ids[code] = new_id
+            _save_cache()
 
 
 async def start_series(message: Message, state: FSMContext, user_id: int) -> None:

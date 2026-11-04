@@ -3,17 +3,35 @@ import random
 from dataclasses import dataclass
 from pathlib import Path
 
-from config import EUROPE_JSON, FLAGS_DIR
+from config import DATA_DIR, FLAGS_DIR
 
-SERIES_BY_LEVEL = {1: 10, 2: 15, 3: 20}   # вопросов в одной серии
-OPTIONS_BY_LEVEL = {1: 3, 2: 4, 3: 5}  # сколько вариантов ответа на уровне
+SERIES_BY_LEVEL = {1: 10, 2: 15, 3: 20}  # вопросов в одной серии
+OPTIONS_BY_LEVEL = {1: 3, 2: 4, 3: 5}    # сколько вариантов ответа на уровне
 
-with open(EUROPE_JSON, encoding="utf-8") as f:
-    _DATA = json.load(f)
+# Файлы материков в том порядке, в каком они идут в меню
+DATA_FILES = ["europe.json", "asia.json"]
 
-COUNTRIES: list[dict] = _DATA["countries"]
-CONTINENTS: dict[str, str] = _DATA["continents"]
-LEVELS: dict[str, str] = _DATA["levels"]
+COUNTRIES: list[dict] = []
+CONTINENTS: dict[str, str] = {}
+LEVELS: dict[str, str] = {}
+
+for _filename in DATA_FILES:
+    _path = DATA_DIR / _filename
+    if not _path.exists():
+        continue
+    with open(_path, encoding="utf-8") as f:
+        _data = json.load(f)
+    CONTINENTS.update(_data["continents"])
+    LEVELS.update(_data["levels"])
+    COUNTRIES.extend(_data["countries"])
+
+# Защита от повторов: один код может быть только в одном файле
+_seen: set[str] = set()
+for _c in COUNTRIES:
+    if _c["code"] in _seen:
+        raise ValueError(f"Повтор кода страны в данных: {_c['code']}")
+    _seen.add(_c["code"])
+
 BY_CODE: dict[str, dict] = {c["code"]: c for c in COUNTRIES}
 
 
@@ -21,7 +39,7 @@ BY_CODE: dict[str, dict] = {c["code"]: c for c in COUNTRIES}
 class Question:
     code: str            # код верной страны
     flag_path: Path      # путь к картинке флага
-    options: list[dict]  # перемешанные варианты (страны)
+    options: list[dict]  # перемешанные варианты
 
 
 def get_pool(continent: str, level: int) -> list[dict]:
@@ -48,7 +66,11 @@ def make_question(code: str, continent: str, level: int) -> Question:
     others = [c for c in pool if c["code"] != code]
     options = random.sample(others, total - 1) + [correct]
     random.shuffle(options)
-    return Question(code=code, flag_path=FLAGS_DIR / f"{code}.png", options=options)
+    return Question(
+        code=code,
+        flag_path=FLAGS_DIR / correct["continent"] / f"{code}.png",
+        options=options,
+    )
 
 
 def is_correct(question_code: str, chosen_code: str) -> bool:

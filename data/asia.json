@@ -1,0 +1,318 @@
+{
+  "continents": {
+    "asia": "Азия"
+  },
+  "levels": {
+    "1": "Лёгкий",
+    "2": "Средний",
+    "3": "Сложный"
+  },
+  "countries": [
+    {
+      "code": "as-ru",
+      "name": "Россия",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "cn",
+      "name": "Китай",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "jp",
+      "name": "Япония",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "in",
+      "name": "Индия",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "kr",
+      "name": "Южная Корея",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "tr",
+      "name": "Турция",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "sa",
+      "name": "Саудовская Аравия",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "il",
+      "name": "Израиль",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "th",
+      "name": "Таиланд",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "vn",
+      "name": "Вьетнам",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "id",
+      "name": "Индонезия",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "kz",
+      "name": "Казахстан",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "ir",
+      "name": "Иран",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "kp",
+      "name": "Северная Корея",
+      "continent": "asia",
+      "level": 1
+    },
+    {
+      "code": "iq",
+      "name": "Ирак",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "pk",
+      "name": "Пакистан",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "bd",
+      "name": "Бангладеш",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "ph",
+      "name": "Филиппины",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "my",
+      "name": "Малайзия",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "sg",
+      "name": "Сингапур",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "ae",
+      "name": "ОАЭ",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "uz",
+      "name": "Узбекистан",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "af",
+      "name": "Афганистан",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "np",
+      "name": "Непал",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "mn",
+      "name": "Монголия",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "sy",
+      "name": "Сирия",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "ge",
+      "name": "Грузия",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "tj",
+      "name": "Таджикистан",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "am",
+      "name": "Армения",
+      "continent": "asia",
+      "level": 2
+    },
+    {
+      "code": "az",
+      "name": "Азербайджан",
+      "continent": "asia",
+      "level": 2
+    },
+        {
+      "code": "jo",
+      "name": "Иордания",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "lb",
+      "name": "Ливан",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "kw",
+      "name": "Кувейт",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "kg",
+      "name": "Киргизия",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "lk",
+      "name": "Шри-Ланка",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "tm",
+      "name": "Туркменистан",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "mm",
+      "name": "Мьянма",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "kh",
+      "name": "Камбоджа",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "la",
+      "name": "Лаос",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "bn",
+      "name": "Бруней",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "tl",
+      "name": "Восточный Тимор",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "bt",
+      "name": "Бутан",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "mv",
+      "name": "Мальдивы",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "om",
+      "name": "Оман",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "ye",
+      "name": "Йемен",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "bh",
+      "name": "Бахрейн",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "qa",
+      "name": "Катар",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "ps",
+      "name": "Палестина",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "tw",
+      "name": "Тайвань",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "hk",
+      "name": "Гонконг",
+      "continent": "asia",
+      "level": 3
+    },
+    {
+      "code": "mo",
+      "name": "Макао",
+      "continent": "asia",
+      "level": 3
+    }
+  ]
+}

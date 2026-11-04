@@ -29,7 +29,8 @@ def main_menu_kb() -> InlineKeyboardMarkup:
 def continents_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for key, name in CONTINENTS.items():
-        kb.button(text=f"🌍 {name}", callback_data=f"cont:{key}")
+        icon = "🌏" if key == "asia" else "🌍"
+        kb.button(text=f"{icon} {name}", callback_data=f"cont:{key}")
     for key, name in COMING_SOON.items():
         if key not in CONTINENTS:
             kb.button(text=f"🌏 {name} · скоро", callback_data=f"soon:{key}")
