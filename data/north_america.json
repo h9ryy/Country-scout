@@ -1,0 +1,162 @@
+{
+  "continents": {
+    "north_america": "Северная Америка"
+  },
+  "settings": {
+    "pool_mode": {
+      "1": "exact",
+      "2": "cumulative",
+      "3": "exact"
+    },
+    "series": {
+      "1": 5,
+      "2": 10,
+      "3": "all"
+    }
+  },
+  "levels": {
+    "1": "Лёгкий",
+    "2": "Средний",
+    "3": "Сложный"
+  },
+  "countries": [
+    {
+      "code": "us",
+      "name": "США",
+      "continent": "north_america",
+      "level": 1
+    },
+    {
+      "code": "ca",
+      "name": "Канада",
+      "continent": "north_america",
+      "level": 1
+    },
+    {
+      "code": "mx",
+      "name": "Мексика",
+      "continent": "north_america",
+      "level": 1
+    },
+    {
+      "code": "cu",
+      "name": "Куба",
+      "continent": "north_america",
+      "level": 1
+    },
+    {
+      "code": "jm",
+      "name": "Ямайка",
+      "continent": "north_america",
+      "level": 1
+    },
+    {
+      "code": "gt",
+      "name": "Гватемала",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "cr",
+      "name": "Коста-Рика",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "pa",
+      "name": "Панама",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "do",
+      "name": "Доминиканская Республика",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "ht",
+      "name": "Гаити",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "bs",
+      "name": "Багамы",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "hn",
+      "name": "Гондурас",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "sv",
+      "name": "Сальвадор",
+      "continent": "north_america",
+      "level": 2
+    },
+    {
+      "code": "bz",
+      "name": "Белиз",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "tt",
+      "name": "Тринидад и Тобаго",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "bb",
+      "name": "Барбадос",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "ni",
+      "name": "Никарагуа",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "ag",
+      "name": "Антигуа и Барбуда",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "dm",
+      "name": "Доминика",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "gd",
+      "name": "Гренада",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "kn",
+      "name": "Сент-Китс и Невис",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "lc",
+      "name": "Сент-Люсия",
+      "continent": "north_america",
+      "level": 3
+    },
+    {
+      "code": "vc",
+      "name": "Сент-Винсент и Гренадины",
+      "continent": "north_america",
+      "level": 3
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "continents": {
+    "south_america": "Южная Америка"
+  },
+  "settings": {
+    "pool_mode": {
+      "1": "exact",
+      "2": "cumulative",
+      "3": "cumulative"
+    },
+    "series": {
+      "1": "all",
+      "2": "all",
+      "3": "all"
+    }
+  },
+  "levels": {
+    "1": "Лёгкий",
+    "2": "Средний",
+    "3": "Сложный"
+  },
+  "countries": [
+    {
+      "code": "br",
+      "name": "Бразилия",
+      "continent": "south_america",
+      "level": 1
+    },
+    {
+      "code": "ar",
+      "name": "Аргентина",
+      "continent": "south_america",
+      "level": 1
+    },
+    {
+      "code": "cl",
+      "name": "Чили",
+      "continent": "south_america",
+      "level": 1
+    },
+    {
+      "code": "pe",
+      "name": "Перу",
+      "continent": "south_america",
+      "level": 1
+    },
+    {
+      "code": "co",
+      "name": "Колумбия",
+      "continent": "south_america",
+      "level": 1
+    },
+    {
+      "code": "ve",
+      "name": "Венесуэла",
+      "continent": "south_america",
+      "level": 2
+    },
+    {
+      "code": "ec",
+      "name": "Эквадор",
+      "continent": "south_america",
+      "level": 2
+    },
+    {
+      "code": "bo",
+      "name": "Боливия",
+      "continent": "south_america",
+      "level": 2
+    },
+    {
+      "code": "uy",
+      "name": "Уругвай",
+      "continent": "south_america",
+      "level": 2
+    },
+    {
+      "code": "py",
+      "name": "Парагвай",
+      "continent": "south_america",
+      "level": 2
+    },
+    {
+      "code": "gy",
+      "name": "Гайана",
+      "continent": "south_america",
+      "level": 3
+    },
+    {
+      "code": "sr",
+      "name": "Суринам",
+      "continent": "south_america",
+      "level": 3
+    }
+  ]
+}

@@ -1,0 +1,339 @@
+{
+  "continents": {
+    "africa": "Африка"
+  },
+  "settings": {
+    "pool_mode": "exact"
+  },
+  "levels": {
+    "1": "Лёгкий",
+    "2": "Средний",
+    "3": "Сложный"
+  },
+  "countries": [
+    {
+      "code": "eg",
+      "name": "Египет",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "za",
+      "name": "ЮАР",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "ng",
+      "name": "Нигерия",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "ke",
+      "name": "Кения",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "ma",
+      "name": "Марокко",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "et",
+      "name": "Эфиопия",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "dz",
+      "name": "Алжир",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "gh",
+      "name": "Гана",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "tn",
+      "name": "Тунис",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "sn",
+      "name": "Сенегал",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "tz",
+      "name": "Танзания",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "ug",
+      "name": "Уганда",
+      "continent": "africa",
+      "level": 1
+    },
+    {
+      "code": "ly",
+      "name": "Ливия",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "sd",
+      "name": "Судан",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "ao",
+      "name": "Ангола",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "mz",
+      "name": "Мозамбик",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "zm",
+      "name": "Замбия",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "zw",
+      "name": "Зимбабве",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "cm",
+      "name": "Камерун",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "ci",
+      "name": "Кот-д’Ивуар",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "cd",
+      "name": "ДР Конго",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "mg",
+      "name": "Мадагаскар",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "na",
+      "name": "Намибия",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "bw",
+      "name": "Ботсвана",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "ml",
+      "name": "Мали",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "so",
+      "name": "Сомали",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "mw",
+      "name": "Малави",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "mu",
+      "name": "Маврикий",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "ga",
+      "name": "Габон",
+      "continent": "africa",
+      "level": 2
+    },
+    {
+      "code": "bj",
+      "name": "Бенин",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "bf",
+      "name": "Буркина-Фасо",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "bi",
+      "name": "Бурунди",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "cv",
+      "name": "Кабо-Верде",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "cf",
+      "name": "ЦАР",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "td",
+      "name": "Чад",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "km",
+      "name": "Коморы",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "cg",
+      "name": "Республика Конго",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "dj",
+      "name": "Джибути",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "gq",
+      "name": "Экваториальная Гвинея",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "er",
+      "name": "Эритрея",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "sz",
+      "name": "Эсватини",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "gm",
+      "name": "Гамбия",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "gn",
+      "name": "Гвинея",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "gw",
+      "name": "Гвинея-Бисау",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "ls",
+      "name": "Лесото",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "lr",
+      "name": "Либерия",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "mr",
+      "name": "Мавритания",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "ne",
+      "name": "Нигер",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "rw",
+      "name": "Руанда",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "st",
+      "name": "Сан-Томе и Принсипи",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "sc",
+      "name": "Сейшелы",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "sl",
+      "name": "Сьерра-Леоне",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "ss",
+      "name": "Южный Судан",
+      "continent": "africa",
+      "level": 3
+    },
+    {
+      "code": "tg",
+      "name": "Того",
+      "continent": "africa",
+      "level": 3
+    }
+  ]
+}

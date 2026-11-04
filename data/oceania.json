@@ -1,0 +1,162 @@
+{
+  "continents": {
+    "oceania": "Океания"
+  },
+  "settings": {
+    "pool_mode": {
+      "1": "exact",
+      "2": "cumulative",
+      "3": "exact"
+    },
+    "series": {
+      "1": "all",
+      "2": 10,
+      "3": "all"
+    }
+  },
+  "levels": {
+    "1": "Лёгкий",
+    "2": "Средний",
+    "3": "Сложный"
+  },
+  "countries": [
+    {
+      "code": "au",
+      "name": "Австралия",
+      "continent": "oceania",
+      "level": 1
+    },
+    {
+      "code": "nz",
+      "name": "Новая Зеландия",
+      "continent": "oceania",
+      "level": 1
+    },
+    {
+      "code": "fj",
+      "name": "Фиджи",
+      "continent": "oceania",
+      "level": 1
+    },
+    {
+      "code": "pg",
+      "name": "Папуа — Новая Гвинея",
+      "continent": "oceania",
+      "level": 1
+    },
+    {
+      "code": "ws",
+      "name": "Самоа",
+      "continent": "oceania",
+      "level": 1
+    },
+    {
+      "code": "to",
+      "name": "Тонга",
+      "continent": "oceania",
+      "level": 1
+    },
+    {
+      "code": "sb",
+      "name": "Соломоновы Острова",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "vu",
+      "name": "Вануату",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "ki",
+      "name": "Кирибати",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "mh",
+      "name": "Маршалловы Острова",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "nr",
+      "name": "Науру",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "pw",
+      "name": "Палау",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "fm",
+      "name": "Микронезия",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "tv",
+      "name": "Тувалу",
+      "continent": "oceania",
+      "level": 2
+    },
+    {
+      "code": "gu",
+      "name": "Гуам",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "pf",
+      "name": "Французская Полинезия",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "nc",
+      "name": "Новая Каледония",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "ck",
+      "name": "Острова Кука",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "nu",
+      "name": "Ниуэ",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "as",
+      "name": "Американское Самоа",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "mp",
+      "name": "Северные Марианские острова",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "tk",
+      "name": "Токелау",
+      "continent": "oceania",
+      "level": 3
+    },
+    {
+      "code": "nf",
+      "name": "Остров Норфолк",
+      "continent": "oceania",
+      "level": 3
+    }
+  ]
+}

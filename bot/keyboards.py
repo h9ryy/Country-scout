@@ -1,12 +1,21 @@
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.game import CONTINENTS, LEVELS, SERIES_BY_LEVEL, get_pool
+from bot.game import CONTINENTS, LEVELS, series_length
 from config import PERFECT_RUNS_TO_MASTER
 
-# Материки, которые готовятся: кнопка есть, игра пока недоступна.
-# Когда появятся данные, материк убираем отсюда.
-COMING_SOON = {"asia": "Азия"}
+# Иконки материков в меню
+CONTINENT_ICONS = {
+    "europe": "🌍",
+    "africa": "🌍",
+    "asia": "🌏",
+    "oceania": "🌏",
+    "north_america": "🌎",
+    "south_america": "🌎",
+}
+
+# Материки, которые готовятся (кнопка есть, игра недоступна). Сейчас пусто.
+COMING_SOON: dict[str, str] = {}
 
 
 def _questions_word(n: int) -> str:
@@ -29,7 +38,7 @@ def main_menu_kb() -> InlineKeyboardMarkup:
 def continents_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for key, name in CONTINENTS.items():
-        icon = "🌏" if key == "asia" else "🌍"
+        icon = CONTINENT_ICONS.get(key, "🌍")
         kb.button(text=f"{icon} {name}", callback_data=f"cont:{key}")
     for key, name in COMING_SOON.items():
         if key not in CONTINENTS:
@@ -45,8 +54,7 @@ def levels_kb(
     """progress[уровень] = (безошибочных серий, освоен ли уровень)."""
     kb = InlineKeyboardBuilder()
     for level, name in LEVELS.items():
-        pool = get_pool(continent, int(level))
-        n = min(SERIES_BY_LEVEL[int(level)], len(pool))  # сколько реально вопросов
+        n = series_length(continent, int(level))  # сколько реально вопросов
         text = f"{name} · {n} {_questions_word(n)}"
 
         runs, mastered = progress.get(int(level), (0, False))
