@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     bot_token: str
     database_path: str = "data/bot.db"
     cache_dir: str = "cache"
+    admin_id: int | None = None
 
 
 settings = Settings()
