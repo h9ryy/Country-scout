@@ -14,14 +14,14 @@ class Settings(BaseSettings):
 
     bot_token: str
     database_path: str = "data/bot.db"
+    cache_dir: str = "cache"
 
 
 settings = Settings()
 
 DB_PATH = BASE_DIR / settings.database_path
+CACHE_DIR = BASE_DIR / settings.cache_dir
 DATA_DIR = BASE_DIR / "data"
-EUROPE_JSON = BASE_DIR / "data" / "europe.json"
-ASIA_JSON = BASE_DIR / "data" / "asia.json"
 FLAGS_DIR = BASE_DIR / "flags"
 
 # Очки (глобусы 🌐) по уровням: (за верный ответ, за ошибку)

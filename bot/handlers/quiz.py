@@ -16,13 +16,13 @@ from bot.storage import (
     revert_points,
 )
 from bot.ui import remember, replace_screen, safe_delete
-from config import BASE_DIR, PERFECT_RUNS_TO_MASTER
+from config import CACHE_DIR, PERFECT_RUNS_TO_MASTER
 
 router = Router()
 
 # Кэш: код страны -> file_id картинки в Telegram. Хранится в файле,
 # поэтому флаги не загружаются заново после перезапуска бота.
-CACHE_PATH = BASE_DIR / "cache" / "file_ids.json"
+CACHE_PATH = CACHE_DIR / "file_ids.json"
 
 
 def _load_cache() -> dict[str, str]:
@@ -33,7 +33,7 @@ def _load_cache() -> dict[str, str]:
 
 
 def _save_cache() -> None:
-    CACHE_PATH.parent.mkdir(exist_ok=True)
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     CACHE_PATH.write_text(json.dumps(_file_ids), encoding="utf-8")
 
 
