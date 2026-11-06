@@ -1,11 +1,14 @@
+import asyncio
 import json
+import logging
+import time
 
-from aiogram import F, Router
-from aiogram.exceptions import TelegramBadRequest
+from aiogram import Bot, F, Router
+from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto, Message
 
-from bot.game import BY_CODE, is_correct, make_question, new_series
+from bot.game import BY_CODE, COUNTRIES, is_correct, make_question, new_series
 from bot.keyboards import after_series_kb, main_menu_kb, options_kb
 from bot.storage import (
     add_answer,
@@ -16,7 +19,7 @@ from bot.storage import (
     revert_points,
 )
 from bot.ui import remember, replace_screen, safe_delete
-from config import CACHE_DIR, PERFECT_RUNS_TO_MASTER
+from config import CACHE_DIR, FLAGS_DIR, PERFECT_RUNS_TO_MASTER
 
 router = Router()
 
@@ -38,6 +41,35 @@ def _save_cache() -> None:
 
 
 _file_ids: dict[str, str] = _load_cache()
+
+
+async def warm_cache(bot: Bot, chat_id: int) -> int:
+    """Загружает в Telegram все флаги, которых нет в кэше, и запоминает их
+    file_id. Тогда в игре ни один флаг не грузится заново."""
+    uploaded = 0
+    for country in COUNTRIES:
+        code = country["code"]
+        if code in _file_ids:
+            continue
+        path = FLAGS_DIR / country["continent"] / f"{code}.png"
+        try:
+            try:
+                msg = await bot.send_photo(chat_id, FSInputFile(path))
+            except TelegramRetryAfter as e:
+                await asyncio.sleep(e.retry_after + 1)
+                msg = await bot.send_photo(chat_id, FSInputFile(path))
+        except FileNotFoundError:
+            logging.warning("Нет файла флага %s", path)
+            continue
+        _file_ids[code] = msg.photo[-1].file_id
+        uploaded += 1
+        await safe_delete(msg)
+        if uploaded % 20 == 0:
+            _save_cache()
+        await asyncio.sleep(1.1)  # лимиты Telegram на сообщения в один чат
+    if uploaded:
+        _save_cache()
+    return uploaded
 
 
 async def send_question(
@@ -63,6 +95,7 @@ async def send_question(
 
     cached = _file_ids.get(code)
     fresh = FSInputFile(question.flag_path)
+    started = time.perf_counter()
 
     if message.photo:
         # Серия уже идёт: меняем картинку в том же сообщении
@@ -75,6 +108,7 @@ async def send_question(
             if cached is None:
                 raise
             # file_id устарел: загружаем файл заново
+            cached = None
             sent = await message.edit_media(
                 media=InputMediaPhoto(media=fresh, caption=caption),
                 reply_markup=markup,
@@ -88,10 +122,18 @@ async def send_question(
         except TelegramBadRequest:
             if cached is None:
                 raise
+            cached = None
             sent = await message.answer_photo(
                 fresh, caption=caption, reply_markup=markup
             )
         await safe_delete(message)
+
+    logging.info(
+        "флаг %s: %s, %d мс",
+        code,
+        "из кэша" if cached else "загрузка файла",
+        (time.perf_counter() - started) * 1000,
+    )
 
     if isinstance(sent, Message):
         remember(sent)
@@ -149,10 +191,12 @@ async def answer(callback: CallbackQuery, state: FSMContext) -> None:
     scored = data.get("scored", True)
 
     user = callback.from_user
+    db_started = time.perf_counter()
     old_balance = await get_balance(user.id)
     balance = await add_answer(
         user.id, user.username, ok, data["level"], scored=scored
     )
+    logging.info("ответ: база данных %d мс", (time.perf_counter() - db_started) * 1000)
     gained = balance - old_balance
 
     name = BY_CODE[current]["name"]

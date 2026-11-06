@@ -212,3 +212,20 @@ async def revert_points(user_id: int, delta: int) -> int:
         )
         row = await cur.fetchone()
     return row[0] if row else 0
+
+async def get_admin_stats() -> dict[str, int]:
+    """Сводка для админа: игроки, серии, ответы, сумма глобусов."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            "SELECT COUNT(*), COALESCE(SUM(correct + wrong), 0), "
+            "COALESCE(SUM(globes), 0) FROM players"
+        )
+        players, answers, globes = await cur.fetchone()
+        cur = await db.execute("SELECT COUNT(*) FROM series_history")
+        (series,) = await cur.fetchone()
+    return {
+        "players": players,
+        "answers": answers,
+        "globes": globes,
+        "series": series,
+    }
